@@ -35,7 +35,7 @@ llm_client = OpenAI(
 )
 
 
-def request_chat(query, context, stream=True):
+def request_chat(query, context, history_messages, stream=False):
 
     prompt = LLM_CHAT_PROMPT.format(context=context, query=query) 
 
@@ -43,9 +43,10 @@ def request_chat(query, context, stream=True):
         model=qwen3_8b_tune_model_name,
         messages=[
             {"role": "system", "content": "你是一个有用的人工智能助手."},
+            *history_messages,
             {"role": "user", "content": prompt}
         ],
-        max_tokens=4096,
+        max_tokens=40960,
         frequency_penalty=2.0,
         temperature=0.001,
         top_p=0.95,

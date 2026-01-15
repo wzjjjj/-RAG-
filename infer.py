@@ -23,8 +23,9 @@ bm25_retriever = BM25(docs=None, retrieve=True)
 milvus_retriever = MilvusRetriever(docs=None, retrieve=True) 
 bge_m3_reranker = BGEM3ReRanker(model_path=bge_reranker_tuned_model_path)
 milvus_retriever.retrieve_topk("这是一条测试数据", topk=3)
-
-
+# 加上滑动窗口记忆
+history_messages = []
+MAX_TURNS = 5  # 保留最近 5 轮（=10条 message）
 while True:
     query = input("输入—>")
 
@@ -60,15 +61,18 @@ while True:
 
     # 答案
     context = "\n".join(["【" + str(idx+1) + "】" + doc.page_content for idx, doc in enumerate(ranked_docs)])
-    res_handler = request_chat(query, context, stream=True)
+    res_handler = request_chat(query, context,history_messages,stream=False)
     response = ""
     for r in res_handler:
-        uttr = r.choices[0].delta.content
-        response += uttr 
-        print(uttr, end='')
+        # uttr = r.choices[0].delta.content
+        response += r 
+        print(r, end='')
     print("\n" + "="*100)
 
     # 后处理
     answer = post_processing(response, ranked_docs)
     print("\n答案—>", answer)
+    history_messages.append({"role": "user", "content": query})
+    history_messages.append({"role": "assistant", "content": answer})
+    history_messages =  history_messages[-2*MAX_TURNS:]
 
