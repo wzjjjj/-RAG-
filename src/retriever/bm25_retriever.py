@@ -51,7 +51,7 @@ class BM25(object):
         return [t for t in tokens if t not in _stopwords]
 
 
-    def retrieve_topk(self, query, topk=10):
+    def retrieve_topk(self, query, topk=50):
         # 获得得分在topk的文档和分数
         self.retriever.k = topk
         # query_tokens = jieba.cut_for_search(query)

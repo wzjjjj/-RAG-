@@ -35,7 +35,7 @@ llm_client = OpenAI(
 )
 
 
-def request_chat(query, context, stream=False):
+def request_chat(query, context, stream=True):
 
     prompt = LLM_CHAT_PROMPT.format(context=context, query=query) 
 
